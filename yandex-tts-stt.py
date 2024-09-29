@@ -10,6 +10,7 @@ import boto3
 from botocore.client import Config
 from dotenv import load_dotenv
 from colorama import Fore, Style, init
+import json
 
 # Инициализация colorama
 init(autoreset=True)
@@ -251,15 +252,26 @@ def main():
                     recognition_result = get_recognition_result(iam_token, operation_id)
 
                     if recognition_result:
+                        result = {
+                            "original_text": text,
+                            "words": []
+                        }
                         for chunk in recognition_result:
                             alternatives = chunk.get('alternatives', [])
                             for alternative in alternatives:
                                 words = alternative.get('words', [])
                                 for word_info in words:
-                                    word = word_info['word']
-                                    start_time = word_info['startTime']
-                                    end_time = word_info['endTime']
-                                    print(f"{Fore.GREEN}🗣️ {word}: начало {start_time}, конец {end_time}")
+                                    result["words"].append({
+                                        "word": word_info['word'],
+                                        "start_time": word_info['startTime'],
+                                        "end_time": word_info['endTime']
+                                    })
+                        
+                        # Вывод результата в JSON формате
+                        print(json.dumps(result, ensure_ascii=False, indent=2))
+                        return result  # Возвращаем результат для возможного дальнейшего использования
+    
+    return None  # Возвращаем None в случае ошибки
 
 if __name__ == '__main__':
     main()
