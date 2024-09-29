@@ -228,6 +228,7 @@ def get_recognition_result(iam_token, operation_id):
             return None
 
 # Главная функция
+
 def main():
     # Получение IAM-токена
     iam_token = get_iam_token_from_sa_key()
@@ -261,10 +262,13 @@ def main():
                             for alternative in alternatives:
                                 words = alternative.get('words', [])
                                 for word_info in words:
+                                    # Удаляем 's' из строки времени и преобразуем в миллисекунды
+                                    start_time = int(float(word_info['startTime'].rstrip('s')) * 1000)
+                                    end_time = int(float(word_info['endTime'].rstrip('s')) * 1000)
                                     result["words"].append({
                                         "word": word_info['word'],
-                                        "start_time": word_info['startTime'],
-                                        "end_time": word_info['endTime']
+                                        "start_time": start_time,
+                                        "end_time": end_time
                                     })
                         
                         # Вывод результата в JSON формате
